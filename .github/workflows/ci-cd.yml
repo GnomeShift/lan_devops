@@ -1,0 +1,35 @@
+name: Version update pipeline
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+    - dev
+env:
+  NAME_VERSION_FILE: version
+jobs:
+  validate-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Branch Names
+        id: branch-names
+        uses: tj-actions/branch-names@v8.0.1
+
+      - name: Print info about actions
+        id: repo-info
+        run: |
+          echo "EVENT NAME    : ${{ github.event_name }}"
+          echo "ACTION        : ${{ github.event.action }}"
+          echo "EVENT NAME    : ${{ github.event_name }}"
+          echo "IS            : ${{ github.event.pull_request.merged }}"
+          echo "CURRENT BRANCH: ${{ steps.branch-names.outputs.current_branch }}"
+          echo "REF           : ${{ github.ref }}"
+          echo "REF NAME      : ${{ github.ref_name }}"
+          echo "DEFAULT BRANCH: ${{ steps.branch-names.outputs.default_branch }}"
+
+      - name: validate branch
+        id: validate-branch
+        if: |
+          contains(steps.branch-names.outputs.current_branch,'feature') == false &&
+          contains(steps.branch-names.outputs.current_branch,'hotfix') == false
+        run: exit 1
