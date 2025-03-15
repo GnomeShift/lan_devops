@@ -8,8 +8,8 @@ on:
       - release
         
 env:
-  NAME_VERSION_FILE: ${{ github.workspace }}/version
-  RELEASE_BRACH: release
+  VERSION_FILE: ${{ github.workspace }}/
+  RELEASE_BRANCH: release
   MINOR: minor
   PATCH: patch
   VERSION_UPDATE_SCRIPT: .github/workflows/version_up.py
@@ -37,12 +37,17 @@ jobs:
           echo "REF           : ${{ github.ref }}"
           echo "REF NAME      : ${{ github.ref_name }}"
           echo "DEFAULT BRANCH: ${{ steps.branch-names.outputs.default_branch }}"
-          echo "WOKSPACE      : ${{ github.workspace }}"
+          echo "WORKSPACE      : ${{ github.workspace }}"
   
   security: 
     name: (SEC)
     needs: pre-merge-check
     uses: GnomeShift/lan_devops/.github/workflows/sec.yml@release
+  
+  tests:
+    name: (TEST)
+    needs: security
+    uses: GnomeShift/lan_devops/.github/workflows/test.yml@release
   
   update-version:
     name: (VER) Update version
@@ -57,12 +62,12 @@ jobs:
         id: branch-names
         uses: tj-actions/branch-names@v8
 
-      - name: Сheckout on [${{env.RELEASE_BRACH}}]
+      - name: Checkout on [${{env.RELEASE_BRACH}}]
         uses: actions/checkout@v2
       
-      - name: Print catalog info
+      - name: Print path to version file
         run : |
-          echo "path to version file ${{ env.NAME_VERSION_FILE }}"
+          echo "path to version file: ${{ env.VERSION_FILE }}"
           
       - name: Install and Setup python 
         uses: actions/setup-python@v1
@@ -72,12 +77,12 @@ jobs:
       - name: Update version [minor]
         if: startsWith(steps.branch-names.outputs.current_branch,'feature')
         run: 
-          python ${{env.VERSION_UPDATE_SCRIPT}} ${{ env.MINOR }}
+          python ${{env.VERSION_UPDATE_SCRIPT}} ${{ env.VERSION_FILE }} ${{ env.MINOR }}
 
       - name: Update version [patch]
         if: startsWith(steps.branch-names.outputs.current_branch,'hotfix')
         run:
-          python ${{env.VERSION_UPDATE_SCRIPT}} ${{ env.PATCH }}
+          python ${{env.VERSION_UPDATE_SCRIPT}} ${{ env.VERSION_FILE }} ${{ env.PATCH }}
       
       - name: Save Version and Log to env
         id: get-commit-txt
@@ -114,7 +119,7 @@ jobs:
           echo "show variables"
           echo [${{env.tag}}]
 
-      - name: Сheckout on [${{env.RELEASE_BRACH}}] and v [${{env.tag}}]
+      - name: Checkout on [${{env.RELEASE_BRACH}}] and v [${{env.tag}}]
         uses: actions/checkout@v2
 
       - name: Log in to Docker Hub
