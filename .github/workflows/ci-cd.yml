@@ -48,6 +48,8 @@ jobs:
     name: (TEST)
     needs: security
     uses: GnomeShift/lan_devops/.github/workflows/test.yml@release
+    with:
+      version: alpha
   
   update-version:
     name: (VER) Update version
