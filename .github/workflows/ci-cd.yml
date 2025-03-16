@@ -64,7 +64,7 @@ jobs:
         id: branch-names
         uses: tj-actions/branch-names@v8
 
-      - name: Checkout on [${{env.RELEASE_BRACH}}]
+      - name: Checkout on [${{env.RELEASE_BRANCH}}]
         uses: actions/checkout@v2
       
       - name: Print path to version file
@@ -105,7 +105,7 @@ jobs:
           git add .
           git commit -m "${{ env.COMMIT_MSG }}"
           git tag -a v${{ env.TAG_MSG }} -m "update tag"
-          git push -u origin ${{ env.RELEASE_BRACH }} --tags
+          git push -u origin ${{ env.RELEASE_BRANCH }} --tags
 
   docker-push:
     name: (CI) Docker push
@@ -121,7 +121,7 @@ jobs:
           echo "show variables"
           echo [${{env.tag}}]
 
-      - name: Checkout on [${{env.RELEASE_BRACH}}] and v [${{env.tag}}]
+      - name: Checkout on [${{env.RELEASE_BRANCH}}] and v [${{env.tag}}]
         uses: actions/checkout@v2
 
       - name: Log in to Docker Hub
