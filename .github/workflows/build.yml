@@ -1,6 +1,6 @@
 name: Build
 on:
-  workflow call:
+  workflow_call:
 jobs:
   build:
     name: Build project
