@@ -107,6 +107,11 @@ jobs:
           git tag -a v${{ env.TAG_MSG }} -m "update tag"
           git push -u origin ${{ env.RELEASE_BRANCH }} --tags
 
+  build:
+    name: (CI) Build
+    needs: update-version
+    uses: GnomeShift/lan_devops/.github/workflows/build.yml@release
+
   docker-push:
     name: (CI) Docker push
     permissions:
