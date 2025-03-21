@@ -6,7 +6,7 @@ on:
     types: [closed]
     branches:
       - release
-        
+
 env:
   VERSION_FILE: ${{ github.workspace }}/
   RELEASE_BRANCH: release
@@ -15,92 +15,88 @@ env:
   VERSION_UPDATE_SCRIPT: .github/workflows/version_up.py
   REPO_NAME: ${{ github.event.repository.name }}
   PR_NUMBER: ${{ github.event.number }}
-  URL_REPO: ${{ github.server_url }}/${{ github.repository }}
+  REPO_URL: ${{ github.server_url }}/${{ github.repository }}
   DOCKER_REPO: ${{ secrets.DOCKERHUB_LOGIN }}/${{ github.repository.name }}
 
 jobs:
-  pre-merge-check:
-    name: Print information
+  print-info:
+    name: (INFO) Print info
     runs-on: ubuntu-latest
     steps:
-      - name: Branch Names
+      - name: Get branch names
         id: branch-names
         uses: tj-actions/branch-names@v8.0.1
-      
+
       - name: Print info about repo
         id: repo-info
         run: |
           echo "EVENT NAME    : ${{ github.event_name }}"
           echo "ACTION        : ${{ github.event.action }}"
-          echo "IS            : ${{ github.event.pull_request.merged }}"
+          echo "IS TRUE       : ${{ github.event.pull_request.merged }}"
+          echo "WORKSPACE      : ${{ github.workspace }}"
+          echo "DEFAULT BRANCH: ${{ steps.branch-names.outputs.default_branch }}"
           echo "CURRENT BRANCH: ${{ steps.branch-names.outputs.current_branch }}"
           echo "REF           : ${{ github.ref }}"
           echo "REF NAME      : ${{ github.ref_name }}"
-          echo "DEFAULT BRANCH: ${{ steps.branch-names.outputs.default_branch }}"
-          echo "WORKSPACE      : ${{ github.workspace }}"
-  
-  security: 
+
+  security:
     name: (SEC)
-    needs: pre-merge-check
+    needs: print-info
     uses: GnomeShift/lan_devops/.github/workflows/sec.yml@release
-  
-  tests:
+
+  test:
     name: (TEST)
     needs: security
     uses: GnomeShift/lan_devops/.github/workflows/test.yml@release
     with:
       version: alpha
-  
+
   update-version:
     name: (VER) Update version
     permissions:
       contents: write
-    needs: security
+    needs: test
     runs-on: ubuntu-latest
     outputs:
-      tag: ${{steps.get-commit-txt.outputs.TAG_MSG}}
-    steps:      
+      tag: ${{steps.commit-data.outputs.TAG_MSG}}
+    steps:
+      - name: Setup Python3
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.10"
+
       - name: Get branch names
         id: branch-names
         uses: tj-actions/branch-names@v8
 
       - name: Checkout on [${{env.RELEASE_BRANCH}}]
         uses: actions/checkout@v2
-      
-      - name: Print path to version file
-        run : |
-          echo "path to version file: ${{ env.VERSION_FILE }}"
-          
-      - name: Install and Setup python 
-        uses: actions/setup-python@v1
-        with:
-          python-version: "3.10"
 
       - name: Update version [minor]
         if: startsWith(steps.branch-names.outputs.current_branch,'feature')
-        run: 
-          python ${{env.VERSION_UPDATE_SCRIPT}} ${{ env.VERSION_FILE }} ${{ env.MINOR }}
+        run:
+          python3 ${{env.VERSION_UPDATE_SCRIPT}} ${{ env.VERSION_FILE }} ${{ env.MINOR }}
 
       - name: Update version [patch]
         if: startsWith(steps.branch-names.outputs.current_branch,'hotfix')
         run:
-          python ${{env.VERSION_UPDATE_SCRIPT}} ${{ env.VERSION_FILE }} ${{ env.PATCH }}
-      
-      - name: Save Version and Log to env
-        id: get-commit-txt
-        run: | 
+          python3 ${{env.VERSION_UPDATE_SCRIPT}} ${{ env.VERSION_FILE }} ${{ env.PATCH }}
+
+      - name: Write version and add commit data
+        id: commit-data
+        run: |
           COMMIT_MSG=$(python ${{env.VERSION_UPDATE_SCRIPT}} --version_log)
           TAG_MSG=$(python ${{env.VERSION_UPDATE_SCRIPT}} --version)
           echo "COMMIT_MSG=${COMMIT_MSG}" >> $GITHUB_ENV
           echo "TAG_MSG=${TAG_MSG}" >> $GITHUB_ENV
           echo "TAG_MSG=${TAG_MSG}" >> $GITHUB_OUTPUT
 
-      - name: Setup git config
+      - name: Setup Git
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
 
-      - name: Update version and put tag
+      - name: Commit and set tag
         run: |
           git add .
           git commit -m "${{ env.COMMIT_MSG }}"
@@ -108,7 +104,7 @@ jobs:
           git push -u origin ${{ env.RELEASE_BRANCH }} --tags
 
   build:
-    name: (CI) Build
+    name: (CI)
     needs: update-version
     uses: GnomeShift/lan_devops/.github/workflows/build.yml@release
 
@@ -121,21 +117,16 @@ jobs:
     env: 
       tag: ${{needs.update-version.outputs.tag}}
     steps:
-      - name: Prepare env 
-        run: | 
-          echo "show variables"
-          echo [${{env.tag}}]
-
-      - name: Checkout on [${{env.RELEASE_BRANCH}}] and v [${{env.tag}}]
+      - name: Checkout on [${{env.RELEASE_BRANCH}}]
         uses: actions/checkout@v2
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+      - name: Login to DockerHub
+        uses: docker/login-action@v3.4.0
         with:
           username: ${{ secrets.DOCKERHUB_LOGIN }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build and push Docker image to DockerHub
+      - name: Build and push Docker-image to DockerHub
         uses: docker/build-push-action@v2
         with:
           context: .
