@@ -5,28 +5,29 @@ on:
       version:
         type: string
         required: true
-jobs: 
-  unit: 
+
+jobs:
+  unit:
     name: Unit-test
     runs-on: ubuntu-latest
     steps:
       - name: Run test
-        run: | 
+        run: |
           echo "simple run test"
-  smoke: 
-    name: Smoke-test 
+  smoke:
+    name: Smoke-test
     runs-on: ubuntu-latest
     steps:
       - name: Run test
-        run: | 
+        run: |
           echo "simple run test"
   
   fazz:
-    name: Fazzing 
+    name: Fazzing
     runs-on: ubuntu-latest
     steps:
       - name: Run test
-        run: | 
+        run: |
           echo "simple run test"
 
   integr:
@@ -34,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run test
-        run: | 
+        run: |
           echo "simple run test"
 
   regress:
@@ -42,5 +43,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run test
-        run: | 
+        run: |
           echo "simple run test"
