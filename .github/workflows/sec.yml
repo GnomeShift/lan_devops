@@ -20,6 +20,34 @@ jobs:
     runs-on: ubuntu-latest
     name: Lint
     steps:
-      - name: first-step
-        run : |
+      - name: Run linter
+        run: |
           echo "OK"
+
+  deps-check:
+    runs-on: ubuntu-latest
+    name: Dependency check
+    steps:
+      - name: Run deps-checker
+        run: |
+          echo "OK"
+
+  set-label:
+    name: Set sec-passed label
+    needs: [antivirus, lint, deps-check]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Set sec-passed label
+        if: ${{ needs.antivirus.result == 'success' && needs.lint.result == 'success' && needs.deps-check.result == 'success' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo
+              labels: ['sec-passed']
+            })
