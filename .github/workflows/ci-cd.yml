@@ -156,6 +156,10 @@ jobs:
           addSections: '{"documentation":{"prefix":"### 📖 Documentation","labels":["documentation"]},"tests":{"prefix":"### ✅ Testing","labels":["tests"]}}'
           dateFormat: "%d.%m.%Y"
 
+      - name: Git pull
+        run: |
+          git pull
+
       - name: Setup Git
         run: |
           git config user.name "GitHub Actions Bot"
