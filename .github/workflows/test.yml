@@ -45,3 +45,23 @@ jobs:
       - name: Run test
         run: |
           echo "simple run test"
+
+  set-label:
+    name: Set test-passed label
+    needs: [unit, smoke, fazz, integr, regress]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Set test-passed label
+        if: ${{ needs.unit.result == 'success' && needs.smoke.result == 'success' && needs.fazz.result == 'success' && needs.integr.result == 'success' && needs.regress.result == 'success' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo
+              labels: ['test-passed']
+            })
