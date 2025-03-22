@@ -49,6 +49,8 @@ jobs:
 
   test:
     name: (TEST)
+    permissions:
+      pull-requests: write
     needs: security
     uses: GnomeShift/lan_devops/.github/workflows/test.yml@release
     with:
@@ -122,6 +124,8 @@ jobs:
 
   build:
     name: (CI)
+    permissions:
+      pull-requests: write
     needs: update-version
     uses: GnomeShift/lan_devops/.github/workflows/build.yml@release
 
