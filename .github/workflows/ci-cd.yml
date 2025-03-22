@@ -137,11 +137,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [update-version, build]
     steps:
-      - name: Setup Git
-        run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -160,6 +155,11 @@ jobs:
           prLabel: '### 📁 Other pull requests'
           addSections: '{"documentation":{"prefix":"### 📖 Documentation","labels":["documentation"]},"tests":{"prefix":"### ✅ Testing","labels":["tests"]}}'
           dateFormat: "%d.%m.%Y"
+
+      - name: Setup Git
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
 
       - name: Commit
         if: success()
@@ -190,6 +190,7 @@ jobs:
     name: (CI) Docker push
     permissions:
       contents: write
+      pull-requests: write
     runs-on: ubuntu-latest
     needs: [build, update-version]
     env: 
