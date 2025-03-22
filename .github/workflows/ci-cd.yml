@@ -127,12 +127,12 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
-    needs: [update-version]
+    needs: [build, update-version]
     env: 
       tag: ${{needs.update-version.outputs.tag}}
     steps:
       - name: Checkout on [${{env.RELEASE_BRANCH}}]
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Login to DockerHub
         uses: docker/login-action@v3.4.0
@@ -147,3 +147,16 @@ jobs:
           file: ./dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_LOGIN }}/${{env.REPO_NAME}}:v${{env.tag}}
+
+      - name: Set DockerHub label
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo
+              labels: ['DockerHub']
+            })
