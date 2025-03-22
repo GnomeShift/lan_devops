@@ -153,7 +153,7 @@ jobs:
           issuesLabel: '### 📁 Other issues'
           prLabel: '### 📁 Other pull requests'
           addSections: '{"documentation":{"prefix":"### 📖 Documentation","labels":["documentation"]},"tests":{"prefix":"### ✅ Testing","labels":["tests"]}}'
-          dateFormat: %d.%m.%Y
+          dateFormat: "%d.%m.%Y"
 
       - name: Commit
         if: success()
