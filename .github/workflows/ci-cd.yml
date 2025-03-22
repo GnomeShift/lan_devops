@@ -118,7 +118,7 @@ jobs:
             github.rest.issues.addLabels({
               issue_number: context.issue.number,
               owner: context.repo.owner,
-              repo: context.repo.repo
+              repo: context.repo.repo,
               labels: ['${{ steps.commit-data.outputs.TAG_MSG }}']
             })
 
@@ -182,7 +182,7 @@ jobs:
             github.rest.issues.addLabels({
               issue_number: context.issue.number,
               owner: context.repo.owner,
-              repo: context.repo.repo
+              repo: context.repo.repo,
               labels: ['changelog']
             })
 
@@ -221,6 +221,6 @@ jobs:
             github.rest.issues.addLabels({
               issue_number: context.issue.number,
               owner: context.repo.owner,
-              repo: context.repo.repo
+              repo: context.repo.repo,
               labels: ['DockerHub']
             })
