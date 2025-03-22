@@ -42,6 +42,8 @@ jobs:
 
   security:
     name: (SEC)
+    permissions:
+      pull-requests: write
     needs: print-info
     uses: GnomeShift/lan_devops/.github/workflows/sec.yml@release
 
