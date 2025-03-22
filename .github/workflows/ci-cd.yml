@@ -55,6 +55,7 @@ jobs:
     name: (VER) Update version
     permissions:
       contents: write
+      pull-requests: write
     needs: test
     runs-on: ubuntu-latest
     outputs:
@@ -70,7 +71,7 @@ jobs:
         uses: tj-actions/branch-names@v8
 
       - name: Checkout on [${{env.RELEASE_BRANCH}}]
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Update version [minor]
         if: startsWith(steps.branch-names.outputs.current_branch,'feature')
@@ -102,6 +103,19 @@ jobs:
           git commit -m "${{ env.COMMIT_MSG }}"
           git tag -a v${{ env.TAG_MSG }} -m "update tag"
           git push -u origin ${{ env.RELEASE_BRANCH }} --tags
+
+      - name: Set version label
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo
+              labels: ['${{ steps.commit-data.outputs.TAG_MSG }}']
+            })
 
   build:
     name: (CI)
