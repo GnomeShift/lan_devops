@@ -1,5 +1,13 @@
 # 📑 Changelog
 
+## [v0.7.0](https://github.com/GnomeShift/lan_devops/tree/v0.7.0) (23.03.2025)
+
+[Full Changelog](https://github.com/GnomeShift/lan_devops/compare/v0.6.0...v0.7.0)
+
+### 📖 Documentation
+
+- feature: new text [\#17](https://github.com/GnomeShift/lan_devops/pull/17) ([GnomeShift](https://github.com/GnomeShift))
+
 ## [v0.6.0](https://github.com/GnomeShift/lan_devops/tree/v0.6.0) (23.03.2025)
 
 [Full Changelog](https://github.com/GnomeShift/lan_devops/compare/v0.5.2...v0.6.0)
