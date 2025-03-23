@@ -275,13 +275,15 @@ jobs:
           format: markdown
           document: ${{ env.CHANGELOG_FILE }}
           message: |
-            🔔🆙 Новые изменения!
+            🆙 Новые изменения!
+            
+            **GitHub**
             **📁 Репозиторий:** [${{ env.REPO_NAME }}](${{ env.REPO_URL }})
             **✏️ Версия:** [${{ env.tag }}](${{ env.REPO_URL }}/releases/tag/v${{ env.tag }})
             **👤 Автор:** `${{ github.actor }}`
-            **📆 Дата и время:** `${{ steps.get-datetime.outputs.formattedTime }}`
+            **📆 Дата и время:** ${{ steps.get-datetime.outputs.formattedTime }}
             **🔢 Номер PR:** [${{ env.PR_NUMBER }}](${{ env.REPO_URL }}/pull/${{ env.PR_NUMBER }})
             
-            *DockerHub*
+            **DockerHub**
             **👤 Владелец:** [${{ secrets.DOCKERHUB_LOGIN }}](https://hub.docker.com/u/${{ secrets.DOCKERHUB_LOGIN }})
             **✏️ Название:** [${{ env.REPO_NAME }}](https://hub.docker.com/repository/docker/${{ secrets.DOCKERHUB_LOGIN }}/${{ env.REPO_NAME }}/general)
