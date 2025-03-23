@@ -240,3 +240,46 @@ jobs:
           enable-url-completion: true
           readme-filepath: ./README.md
           short-description: ${{ github.event.repository.description }}
+
+  tg-notify:
+    name: (TG) Notify
+    needs: [changelog, docker-push]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get branch names
+        id: branch-names
+        uses: tj-actions/branch-names@v8
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download changelog
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{env.CHANGELOG_FILE}}
+
+      - name: Get current datetime
+        id: get-datetime
+        uses: josStorer/get-current-time@v2
+        with:
+          format: "YY.MM.DD HH:mm:ss"
+          timezone: Europe/Moscow
+
+      - name: Send message in TG
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TG_TO }}
+          token: ${{ secrets.TG_TOKEN }}
+          format: markdown
+          document: ${{ env.CHANGELOG_FILE }}
+          message: |
+            🔔🆙 Новые изменения!<br>
+            **📁 Репозиторий:** [${{ env.REPO_NAME }}](${{ env.REPO_URL }})<br>
+            **✏️ Версия:** [${{ env.tag }}](${{ env.REPO_URL }}/releases/tag/v${{ env.tag }})<br>
+            **👤 Автор:** `${{ github.actor }}`<br>
+            **📆 Дата и время:** `${{ steps.get-datetime.outputs.formattedTime }}`<br>
+            **🔢 Номер PR:** [${{ env.PR_NUMBER }}](${{ env.REPO_URL }}/pull/${{ env.PR_NUMBER }})<br>
+            
+            *DockerHub*<br>
+            **👤Владелец:** [${{ secrets.DOCKERHUB_LOGIN }}](https://hub.docker.com/u/${{ secrets.DOCKERHUB_LOGIN }})<br>
+            **✏️Название:** [${{ env.REPO_NAME }}](https://hub.docker.com/repository/docker/${{ secrets.DOCKERHUB_LOGIN }}/${{ env.REPO_NAME }})/general<br>
