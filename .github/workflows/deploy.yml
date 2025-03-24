@@ -11,12 +11,15 @@ on:
       CHANGELOG_FILE:
         type: string
         required: true
+    secrets:
+      DOCKER_LOGIN:
+        required: true
 
 env:
   TAG: ${{ inputs.version || 'latest' }}
   CONTAINER_NAME: ${{ inputs.container_name }}
   PROD_ENV: "PROD.env"
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_LOGIN }}/${{ inputs.container_name }}:${{ inputs.version }}
+  IMAGE_NAME: ${{ secrets.DOCKER_LOGIN }}/${{ inputs.container_name }}:${{ inputs.version }}
   CHANGELOG_FILE: ${{ inputs.CHANGELOG_FILE }}
 
 jobs:
