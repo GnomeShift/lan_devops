@@ -45,14 +45,14 @@ jobs:
     permissions:
       pull-requests: write
     needs: print-info
-    uses: GnomeShift/lan_devops/.github/workflows/sec.yml@release
+    uses: ./.github/workflows/sec.yml@release
 
   test:
     name: (TEST)
     permissions:
       pull-requests: write
     needs: security
-    uses: GnomeShift/lan_devops/.github/workflows/test.yml@release
+    uses: ./.github/workflows/test.yml@release
     with:
       version: alpha
 
@@ -127,7 +127,7 @@ jobs:
     permissions:
       pull-requests: write
     needs: update-version
-    uses: GnomeShift/lan_devops/.github/workflows/build.yml@release
+    uses: ./.github/workflows/build.yml@release
 
   changelog:
     name: (DOCS) Changelog
@@ -294,11 +294,8 @@ jobs:
       contents: write
       pull-requests: write
     needs: [update-version, docker-push]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy
-        uses: GnomeShift/lan_devops/.github/workflows/deploy.yml@release
-        with:
-          container_name: ${{ env.REPO_NAME }}
-          version: v${{ needs.update-version.outputs.tag }}
-          CHANGELOG_FILE: ${{ env.CHANGELOG_FILE }}
+    uses: ./.github/workflows/deploy.yml@release
+    with:
+      container_name: lan_devops
+      version: v${{ needs.update-version.outputs.tag }}
+      CHANGELOG_FILE: CHANGELOG.md
