@@ -8,9 +8,6 @@ on:
       container_name:
         type: string
         required: true
-      CHANGELOG_FILE:
-        type: string
-        required: true
     secrets:
       DOCKER_LOGIN:
         required: true
@@ -20,7 +17,6 @@ env:
   CONTAINER_NAME: ${{ inputs.container_name }}
   PROD_ENV: "PROD.env"
   IMAGE_NAME: ${{ secrets.DOCKER_LOGIN }}/${{ inputs.container_name }}:${{ inputs.version }}
-  CHANGELOG_FILE: ${{ inputs.CHANGELOG_FILE }}
 
 jobs:
   prod:
@@ -86,4 +82,4 @@ jobs:
           name: ${{ env.TAG }}
           tag_name: ${{ env.TAG }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          body_path: ${{ env.CHANGELOG_FILE }}
+          generate_release_notes: true
