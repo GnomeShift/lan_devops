@@ -294,7 +294,11 @@ jobs:
       contents: write
       pull-requests: write
     needs: [update-version, docker-push]
-    uses: GnomeShift/lan_devops/.github/workflows/deploy.yml@release
-    with:
-      container_name: ${{ env.REPO_NAME }}
-      CHANGELOG_FILE: ${{ env.CHANGELOG_FILE }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        uses: GnomeShift/lan_devops/.github/workflows/deploy.yml@release
+        with:
+          container_name: ${{ env.REPO_NAME }}
+          version: v${{ needs.update-version.outputs.tag }}
+          CHANGELOG_FILE: ${{ env.CHANGELOG_FILE }}
