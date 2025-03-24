@@ -214,7 +214,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./dockerfile
+          file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_LOGIN }}/${{ env.REPO_NAME }}:v${{ env.tag }}
 
@@ -287,3 +287,14 @@ jobs:
             **DockerHub**
             **👤 Владелец:** [${{ secrets.DOCKERHUB_LOGIN }}](https://hub.docker.com/u/${{ secrets.DOCKERHUB_LOGIN }})
             **✏️ Название:** [${{ env.REPO_NAME }}](https://hub.docker.com/repository/docker/${{ secrets.DOCKERHUB_LOGIN }}/${{ env.REPO_NAME }}/general)
+
+  deploy:
+    name: (Deploy)
+    permissions:
+      contents: write
+      pull-requests: write
+    needs: [update-version, docker-push]
+    uses: GnomeShift/lan_devops/.github/workflows/deploy.yml@release
+    with:
+      container_name: ${{ env.REPO_NAME }}
+      CHANGELOG_FILE: ${{ env.CHANGELOG_FILE }}
