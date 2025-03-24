@@ -1,5 +1,13 @@
 # 📑 Changelog
 
+## [v0.8.1](https://github.com/GnomeShift/lan_devops/tree/v0.8.1) (24.03.2025)
+
+[Full Changelog](https://github.com/GnomeShift/lan_devops/compare/v0.8.0...v0.8.1)
+
+### 🐛 Bug fixes
+
+- docs: update `README` [\#21](https://github.com/GnomeShift/lan_devops/pull/21) ([GnomeShift](https://github.com/GnomeShift))
+
 ## [v0.8.0](https://github.com/GnomeShift/lan_devops/tree/v0.8.0) (24.03.2025)
 
 [Full Changelog](https://github.com/GnomeShift/lan_devops/compare/v0.7.0...v0.8.0)
