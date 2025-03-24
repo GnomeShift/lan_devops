@@ -1,5 +1,13 @@
 # 📑 Changelog
 
+## [v0.8.2](https://github.com/GnomeShift/lan_devops/tree/v0.8.2) (24.03.2025)
+
+[Full Changelog](https://github.com/GnomeShift/lan_devops/compare/v0.8.1...v0.8.2)
+
+### 🐛 Bug fixes
+
+- hotfix: typo [\#22](https://github.com/GnomeShift/lan_devops/pull/22) ([GnomeShift](https://github.com/GnomeShift))
+
 ## [v0.8.1](https://github.com/GnomeShift/lan_devops/tree/v0.8.1) (24.03.2025)
 
 [Full Changelog](https://github.com/GnomeShift/lan_devops/compare/v0.8.0...v0.8.1)
