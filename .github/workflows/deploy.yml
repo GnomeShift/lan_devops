@@ -1,0 +1,86 @@
+name: Deploy app to stands
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: false
+      container_name:
+        type: string
+        required: true
+      CHANGELOG_FILE:
+        type: string
+        required: true
+
+env:
+  TAG: ${{ inputs.version || 'latest' }}
+  CONTAINER_NAME: ${{ inputs.container_name }}
+  PROD_ENV: "PROD.env"
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_LOGIN }}/${{ inputs.container_name }}:${{ inputs.version }}
+  CHANGELOG_FILE: ${{ inputs.CHANGELOG_FILE }}
+
+jobs:
+  prod:
+    name: Prod
+    environment: prod
+    runs-on: self-hosted
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Print container info
+        run: |
+          docker ps -a
+          docker images
+
+      - name: Create env
+        shell: bash
+        run: |
+          touch ${{ env.PROD_ENV }}
+          echo "VERSION=${{ env.TAG }}" >> "${{ env.PROD_ENV }}"
+          echo "CONTAINER_NAME=${{ env.CONTAINER_NAME }}" >> "${{ env.PROD_ENV }}"
+          echo "DOCKERHUB_IMAGE=${{ env.IMAGE_NAME }}" >> "${{ env.PROD_ENV }}"
+
+      - name: Run container ${{env.IMAGE_NAME}}
+        run:
+          docker-compose -f docker-compose.yml --env-file ${{ env.PROD_ENV }} --remove-orphans up -d
+
+  set-label:
+    name: Set PROD label
+    needs: [prod]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Set PROD label
+        if: ${{ needs.prod.result == 'success' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['PROD']
+            })
+
+  create-release:
+    name: Create release
+    permissions:
+      contents: write
+    needs: set-label
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ env.TAG }}
+          tag_name: ${{ env.TAG }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body_path: ${{ env.CHANGELOG_FILE }}
