@@ -45,7 +45,7 @@ jobs:
 
       - name: Run container ${{env.IMAGE_NAME}}
         run:
-          docker-compose -f docker-compose.yml --env-file ${{ env.PROD_ENV }} --remove-orphans up -d
+          docker-compose -f docker-compose.yml --env-file ${{ env.PROD_ENV }} up -d
 
   set-label:
     name: Set PROD label
